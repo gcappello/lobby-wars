@@ -3,6 +3,7 @@
 namespace GCappello\LobbyWarsTest\unit\Application\UseCase;
 
 use Exception;
+use GCappello\LobbyWars\Application\UseCase\GetTrialWinnerRequest;
 use GCappello\LobbyWars\Application\UseCase\GetTrialWinnerUseCase;
 use GCappello\LobbyWars\Domain\Contract;
 use GCappello\LobbyWars\Domain\Role;
@@ -16,7 +17,6 @@ class GetTrialWinnerUseCaseTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-
         $this->useCase = new GetTrialWinnerUseCase();
     }
 
@@ -37,10 +37,11 @@ class GetTrialWinnerUseCaseTest extends TestCase
         ];
 
         $contract = new Contract($plaintiffSigners, $defendantSigners);
+        $request = new GetTrialWinnerRequest($contract);
 
-        $winner = $this->useCase->execute($contract);
+        $response = $this->useCase->execute($request);
 
-        $this->assertEquals(GetTrialWinnerUseCase::PLAINTIFF, $winner);
+        $this->assertEquals(GetTrialWinnerUseCase::PLAINTIFF, $response->winner());
     }
 
     public function testGivenAContractWithSamePointsPerPartyWhenWinnerRequestedThenExceptionThrown(): void
@@ -53,7 +54,8 @@ class GetTrialWinnerUseCaseTest extends TestCase
         ];
 
         $contract = new Contract($signers, $signers);
+        $request = new GetTrialWinnerRequest($contract);
 
-        $this->useCase->execute($contract);
+        $this->useCase->execute($request);
     }
 }

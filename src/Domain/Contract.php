@@ -2,12 +2,14 @@
 
 namespace GCappello\LobbyWars\Domain;
 
+use InvalidArgumentException;
+
 class Contract
 {
-    /** @var array Signature[] */
-    private $plaintiffSigns;
-    /** @var array Signature[] */
-    private $defendantSigns;
+    /** @var int */
+    private $plaintiffPoints;
+    /** @var int */
+    private $defendantPoints;
 
     /**
      * @param Role[] $plaintiffSigners
@@ -15,53 +17,60 @@ class Contract
      */
     public function __construct(array $plaintiffSigners, array $defendantSigners)
     {
-        $this->plaintiffSigns = $this->addSignatures($plaintiffSigners);
-        $this->defendantSigns = $this->addSignatures($defendantSigners);
+        $this->plaintiffPoints = $this->calculatePoints($plaintiffSigners);
+        $this->defendantPoints = $this->calculatePoints($defendantSigners);
     }
 
     public function plaintiffPoints(): int
     {
-        return $this->calculatePoints($this->plaintiffSigns);
+        return $this->plaintiffPoints;
     }
 
     public function defendantPoints(): int
     {
-        return $this->calculatePoints($this->defendantSigns);
+        return $this->defendantPoints;
     }
 
     /**
      * @param Role[] $roles
      * @return array
      */
-    private function addSignatures(array $roles): array
+    private static function generateSignatures(array $roles): array
     {
         usort($roles, function (Role $a, Role $b) {
             return $a->points() < $b->points();
         });
 
         $signatures = [];
-        $kingPresence = false;
+        $kingSignature = false;
+        $emptySignature = false;
         foreach ($roles as $role) {
+            if ($emptySignature && $role->isEmpty()) {
+                throw new InvalidArgumentException('Only one empty signature per party allowed');
+            }
+
             $signature = new Signature($role);
-            if ($kingPresence && $role->name() == Role::VALIDATOR) {
+            if ($kingSignature && $role->isValidator()) {
                 $signature->invalidatePoints();
             }
             $signatures[] = $signature;
 
-            if ($role->name() == Role::KING) {
-                $kingPresence = true;
+            if ($role->isKing()) {
+                $kingSignature = true;
+            }
+
+            if ($role->isEmpty()) {
+                $emptySignature = true;
             }
         }
 
         return $signatures;
     }
 
-    /**
-     * @param Signature[] $signatures
-     * @return int
-     */
-    private function calculatePoints(array $signatures): int
+    public static function calculatePoints(array $roles): int
     {
+        $signatures = self::generateSignatures($roles);
+
         $total = 0;
         foreach ($signatures as $signature) {
             $total += $signature->points();

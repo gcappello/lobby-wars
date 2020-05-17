@@ -3,7 +3,6 @@
 namespace GCappello\LobbyWars\Application\UseCase;
 
 use Exception;
-use GCappello\LobbyWars\Domain\Contract;
 
 class GetTrialWinnerUseCase
 {
@@ -11,19 +10,21 @@ class GetTrialWinnerUseCase
     public const DEFENDANT = 'Defendant';
 
     /**
-     * @param Contract $contract
-     * @return string
+     * @param GetTrialWinnerRequest $request
+     * @return GetTrialWinnerResponse
      * @throws Exception
      */
-    public function execute(Contract $contract): string
+    public function execute(GetTrialWinnerRequest $request): GetTrialWinnerResponse
     {
-        $plaintiffPoints = $contract->plaintiffPoints();
-        $defendantPoints = $contract->defendantPoints();
+        $plaintiffPoints = $request->contract()->plaintiffPoints();
+        $defendantPoints = $request->contract()->defendantPoints();
 
-        if ($plaintiffPoints == $defendantPoints) {
-            throw new Exception();
+        if ($plaintiffPoints === $defendantPoints) {
+            throw new Exception('Trial has no winner');
         }
 
-        return ($plaintiffPoints > $defendantPoints) ? self::PLAINTIFF : self::DEFENDANT;
+        $winner = ($plaintiffPoints > $defendantPoints) ? self::PLAINTIFF : self::DEFENDANT;
+
+        return new GetTrialWinnerResponse($winner);
     }
 }

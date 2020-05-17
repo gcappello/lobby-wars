@@ -6,10 +6,10 @@ use InvalidArgumentException;
 
 class Role
 {
-    public const KING = 'K';
-    public const NOTARY = 'N';
-    public const VALIDATOR = 'V';
-    public const EMPTY = '#';
+    public const KING = 'King';
+    public const NOTARY = 'Notary';
+    public const VALIDATOR = 'Validator';
+    public const EMPTY = 'Empty';
 
     private const ROLE_POINTS = [
         self::KING => 5,
@@ -40,7 +40,22 @@ class Role
     private function guardAgainstInvalidName(string $name): void
     {
         if (!array_key_exists($name, self::ROLE_POINTS)) {
-            throw new InvalidArgumentException();
+            throw new InvalidArgumentException('Invalid Role name');
         }
+    }
+
+    public function isKing(): bool
+    {
+        return $this->name === Role::KING;
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->name === Role::EMPTY;
+    }
+
+    public function isValidator()
+    {
+        return $this->name === Role::VALIDATOR;
     }
 }
