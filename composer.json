@@ -1,10 +1,8 @@
 {
-    "name": "gcappello/php-bootstrap",
-    "description": "description",
+    "name": "gcappello/lobby-wars",
+    "description": "Lobby wars - Kata",
     "type": "project",
     "keywords": [
-        "bootstrap",
-        "skeleton",
         "kata",
         "TDD"
     ],
@@ -30,12 +28,12 @@
     },
     "autoload": {
         "psr-4": {
-            "GCappello\\PhpBootstrap\\": "src/"
+            "GCappello\\LobbyWars\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "GCappello\\PhpBootstrapTest\\": "tests/"
+            "GCappello\\LobbyWarsTest\\": "tests/"
         }
     },
     "minimum-stability": "stable",
